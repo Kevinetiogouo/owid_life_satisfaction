@@ -22,11 +22,13 @@ if(!require(pacman)) install.packages("pacman")
 pacman::p_load(plotly, tidyverse, reactable, here)
 ```
 
-```{r}
+```{r echo=FALSE}
 ## Import data
 cantril <- 
-  read_csv(here("data/happiness-cantril-ladder.csv")) %>% 
-  rename(Country = Entity)
+  read_csv(here("data/share-of-people-who-say-they-are-happy.csv")) %>% 
+  rename(Country = Entity, `Cantril ladder score` = `Happiness: Happy (aggregate)`)
+
+#head(cantril)
 ```
 
 “Please imagine a ladder, with steps numbered from 0 at the bottom to 10 at the top. The top of the ladder represents the best possible life for you and the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?”
@@ -37,11 +39,11 @@ cantril <-
 
 ```{r}
 cantril %>% 
-  filter(Year %in% c(2011, 2022)) %>% 
+  filter(Year %in% c(2010, 2022)) %>% 
   pivot_wider(names_from = Year, values_from = `Cantril ladder score`, id_cols = Country) %>% 
-  select(Country, `2011`, `2022`) %>% 
-  mutate(`Absolute change` = round(`2022` - `2011`, 3)) %>% 
-  mutate(`Relative change` = (`2022` - `2011`) / `2011`) %>% 
+  select(Country, `2010`, `2022`) %>% 
+  mutate(`Absolute change` = round(`2022` - `2010`, 3)) %>% 
+  mutate(`Relative change` = (`2022` - `2010`) / `2010`) %>% 
   reactable(
     columns = list(`Relative change` = colDef(format = colFormat(percent = TRUE, digits = 1))) 
   )
@@ -74,7 +76,7 @@ cantril_chart <-
   filter(Country %in% c("Norway", "Australia", "Germany", "Bolivia", "Colombia", "Bhutan")) %>%
   ggplot(aes(x = Year, y = `Cantril ladder score`, color = Country)) +
   geom_line() +
-  scale_y_continuous(limits = c(0, 10)) +
+  scale_y_continuous(limits = c(75, 100)) +
   labs(x = NULL,
        y = NULL, 
        color = NULL) +
